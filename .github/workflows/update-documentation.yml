@@ -23,7 +23,7 @@ jobs:
 
       - name: "Create PR for Documentation"
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -e
           git config --global user.email github-actions@github.com
