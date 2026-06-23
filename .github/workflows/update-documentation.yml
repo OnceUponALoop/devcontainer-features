@@ -9,7 +9,6 @@ jobs:
   generate:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    environment: documentation
     permissions:
       contents: write
       pull-requests: write
@@ -24,7 +23,7 @@ jobs:
 
       - name: "Create PR for Documentation"
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -e
 

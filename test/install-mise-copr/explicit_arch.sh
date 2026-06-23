@@ -10,6 +10,6 @@ check "mise version outputs successfully" \
     mise --version
 
 check "mise binary is x86_64" \
-    bash -c 'file $(which mise) | grep -q x86-64'
+    bash -c 'mise doctor | grep -q "linux-x64"'
 
 reportResults
