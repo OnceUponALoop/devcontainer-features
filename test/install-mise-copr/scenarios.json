@@ -1,0 +1,10 @@
+{
+    "explicit_arch": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "install-mise-copr": {
+                "arch": "x86_64"
+            }
+        }
+    }
+}

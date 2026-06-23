@@ -1,0 +1,24 @@
+{
+    "id": "install-mise-copr",
+    "version": "1.0.0",
+    "name": "mise (native-tls)",
+    "description": "Installs mise from the jdxcode/mise COPR repository to get a native-tls mise build.",
+    "options": {
+        "version": {
+            "type": "string",
+            "default": "latest",
+            "description": "mise version to install (e.g. \"2024.12.19\") or \"latest\" for the most recent release."
+        },
+        "fedora_release": {
+            "type": "string",
+            "default": "44",
+            "description": "Fedora release to use for COPR build artifacts."
+        },
+        "arch": {
+            "type": "string",
+            "proposals": ["x86_64", "aarch64"],
+            "default": "",
+            "description": "CPU architecture. Auto-detected from uname -m when empty."
+        }
+    }
+}

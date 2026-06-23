@@ -1,0 +1,11 @@
+{
+    "extra_cert_only": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "",
+                "extra_certs": "https://letsencrypt.org/certs/isrgrootx1.pem"
+            }
+        }
+    }
+}
