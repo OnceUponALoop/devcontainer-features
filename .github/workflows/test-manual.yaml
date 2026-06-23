@@ -1,0 +1,34 @@
+name: "Manual - Test Features"
+on:
+  workflow_dispatch:
+    inputs:
+      features:
+        description: "Feature to test"
+        required: true
+        default: "proxy-ca-autotrust"
+      baseImage:
+        description: "Base image"
+        required: true
+        default: "mcr.microsoft.com/devcontainers/base:ubuntu"
+      logLevel:
+        description: "Log level (info/debug/trace)"
+        required: true
+        default: "info"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: "Install latest devcontainer CLI"
+        run: npm install -g @devcontainers/cli
+
+      - name: "Testing '${{ inputs.features }}' against '${{ inputs.baseImage }}'"
+        run: |
+          devcontainer features test \
+            --skip-scenarios \
+            -f ${{ inputs.features }} \
+            -i ${{ inputs.baseImage }} \
+            --log-level ${{ inputs.logLevel }} \
+            .

@@ -1,0 +1,44 @@
+{
+    "id": "proxy-ca-autotrust",
+    "version": "1.0.0",
+    "name": "Proxy CA Auto-Trust",
+    "description": "Detects a corporate SSL inspection proxy and automatically trusts its root CA. Optionally installs additional CA certificates.",
+    "documentationURL": "https://github.com/OnceUponALoop/devcontainer-features/tree/main/src/proxy-ca-autotrust",
+    "options": {
+        "detect_url": {
+            "type": "string",
+            "default": "https://example.com",
+            "description": "HTTPS URL to probe for SSL inspection. If verification fails and the chain matches issuer_pattern, the proxy root CA is trusted automatically. Set to empty to skip detection."
+        },
+        "issuer_pattern": {
+            "type": "string",
+            "default": "O=Zscaler Inc.",
+            "description": "String matched (case-insensitive) against certificate issuers in the probed chain. At least one of issuer_pattern or key_fingerprint must be set when detect_url is set."
+        },
+        "key_fingerprint": {
+            "type": "string",
+            "default": "",
+            "description": "SHA-256 SPKI fingerprint (base64) of the proxy CA's public key. When set, a certificate in the chain must match both this and issuer_pattern (if also set). More secure than issuer_pattern alone and survives certificate renewals."
+        },
+        "trust_chain": {
+            "type": "boolean",
+            "default": false,
+            "description": "Trust all certificates in the detected chain except the leaf. Useful when intermediate CAs must also be explicitly trusted."
+        },
+        "extra_certs": {
+            "type": "string",
+            "default": "",
+            "description": "Comma-separated additional CA certificate sources to install. Each entry is an http/https URL or absolute path. PEM and DER formats are supported."
+        }
+    },
+    "containerEnv": {
+        "SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
+        "REQUESTS_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+        "CURL_CA_BUNDLE": "/etc/ssl/certs/ca-certificates.crt",
+        "GIT_SSL_CAINFO": "/etc/ssl/certs/ca-certificates.crt",
+        "NODE_EXTRA_CA_CERTS": "/etc/ssl/certs/ca-certificates.crt"
+    },
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/common-utils": {}
+    }
+}
