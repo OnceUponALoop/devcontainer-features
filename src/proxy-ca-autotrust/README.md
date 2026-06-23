@@ -17,7 +17,7 @@ Detects a corporate SSL inspection proxy and automatically trusts its root CA. O
 |-----|-----|-----|-----|
 | detect_url | HTTPS URL to probe for SSL inspection. If verification fails and the chain matches issuer_pattern, the proxy root CA is trusted automatically. Set to empty to skip detection. | string | https://example.com |
 | issuer_pattern | String matched (case-insensitive) against certificate issuers in the probed chain. At least one of issuer_pattern or key_fingerprint must be set when detect_url is set. | string | O=Zscaler Inc. |
-| key_fingerprint | SHA-256 SPKI fingerprint (base64) of the proxy CA's public key. When set, a certificate in the chain must match both this and issuer_pattern (if also set). More secure than issuer_pattern alone and survives certificate renewals. | string | - |
+| key_fingerprint | SHA-256 SPKI fingerprint (hex) of the proxy CA's public key. When set, a certificate in the chain must match both this and issuer_pattern (if also set). More secure than issuer_pattern alone and survives certificate renewals. | string | - |
 | trust_chain | Trust all certificates in the detected chain except the leaf. Useful when intermediate CAs must also be explicitly trusted. | boolean | false |
 | extra_certs | Comma-separated additional CA certificate sources to install. Each entry is an http/https URL or absolute path. PEM and DER formats are supported. | string | - |
 
@@ -89,7 +89,7 @@ Combine `issuer_pattern` with `key_fingerprint` to pin to a specific public key.
 ```json
 "features": {
     "ghcr.io/onceuponaloop/devcontainer-features/proxy-ca-autotrust:1": {
-        "key_fingerprint": "abc123...base64...=="
+        "key_fingerprint": "a04303e2582c3291e4ed1e5d9f26a5eac1da43cc..."
     }
 }
 ```
