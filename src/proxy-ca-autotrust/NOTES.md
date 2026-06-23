@@ -1,4 +1,4 @@
-SSL inspection proxies (Zscaler, Palo Alto, Cisco Umbrella, etc.) intercept HTTPS traffic by presenting their own certificates in place of the real ones. This causes SSL verification failures in devcontainers that don't carry the proxy's root CA. This feature detects the proxy by probing an HTTPS URL, inspects the certificate chain for a known issuer, and trusts the root CA automatically — no manual certificate distribution required.
+SSL inspection proxies (Zscaler, Palo Alto, Cisco Umbrella, etc.) intercept HTTPS traffic by presenting their own certificates in place of the real ones. This causes a TLS trust gap in devcontainers that don't carry the proxy's root CA. This feature detects the gap by probing a test URL, scans the presented certificate chain for a known CA, and trusts the root automatically — no manual certificate distribution required.
 
 ## Usage
 
@@ -16,12 +16,12 @@ Probes `https://example.com`. If Zscaler is intercepting traffic, its root CA is
 
 ### Custom proxy
 
-If your organisation uses a different SSL inspection proxy, set `issuer_pattern` to a unique substring from your proxy's issuer. See [Identifying your issuer pattern](#identifying-your-issuer-pattern) below.
+If your organisation uses a different SSL inspection proxy, set `cert_pattern` to a regex that matches a unique field in your proxy's certificate (subject, issuer, OID, etc.). See [Identifying your cert pattern](#identifying-your-cert-pattern) below.
 
 ```json
 "features": {
     "ghcr.io/onceuponaloop/devcontainer-features/proxy-ca-autotrust:1": {
-        "issuer_pattern": "O=Palo Alto Networks"
+        "cert_pattern": "O=Palo Alto Networks"
     }
 }
 ```
@@ -35,13 +35,13 @@ Skip auto-detection and install known corporate CA certificates directly:
 ```json
 "features": {
     "ghcr.io/onceuponaloop/devcontainer-features/proxy-ca-autotrust:1": {
-        "detect_url": "",
+        "tls_test_url": "",
         "extra_certs": "https://corp.example.com/root-ca.der,https://corp.example.com/intermediate.crt"
     }
 }
 ```
 
-Both PEM and DER formats are supported. `detect_url` must be explicitly set to empty to skip detection.
+Both PEM and DER formats are supported. `tls_test_url` must be explicitly set to empty to skip detection.
 
 ---
 
@@ -61,17 +61,18 @@ Trust the intercepting proxy's root CA and install additional corporate CAs in o
 
 ### With key fingerprint for stronger verification
 
-Combine `issuer_pattern` with `key_fingerprint` to pin to a specific public key. A certificate in the chain must satisfy both. See [Computing the SPKI fingerprint](#computing-the-spki-fingerprint) below.
+Combine `cert_pattern` with `key_fingerprint` to pin to a specific public key. `cert_pattern` identifies a certificate in the chain by content; `key_fingerprint` then verifies that the issuer of that certificate matches the expected key. Both must pass. See [Computing the SPKI fingerprint](#computing-the-spki-fingerprint) below.
 
 ```json
 "features": {
     "ghcr.io/onceuponaloop/devcontainer-features/proxy-ca-autotrust:1": {
-        "key_fingerprint": "abc123...base64...=="
+        "cert_pattern": "O=Zscaler Inc\\.",
+        "key_fingerprint": "a04303e2582c3291e4ed1e5d9f26a5eac1da43cc..."
     }
 }
 ```
 
-Either `issuer_pattern` or `key_fingerprint` may be used alone, or both together.
+Either `cert_pattern` or `key_fingerprint` may be used alone, or both together.
 
 ---
 
@@ -91,7 +92,7 @@ Trusts every certificate in the detected chain except the leaf. The leaf is alwa
 
 ---
 
-## Identifying your issuer pattern
+## Identifying your cert pattern
 
 Run these commands from any machine behind your corporate network. They work even when SSL verification is failing — `openssl s_client` retrieves the chain without verifying it.
 
@@ -114,7 +115,7 @@ Example output behind Palo Alto:
    i:O=Palo Alto Networks, CN=Palo Alto Networks Root CA
 ```
 
-Pick any unique substring from the `i:` lines as your `issuer_pattern`. The match is case-insensitive.
+Pick any unique substring from the `i:` lines as your `cert_pattern`. The match is case-insensitive and applied against the full `openssl x509 -text` output of each cert, so subject, issuer, SANs, and policy OIDs all work.
 
 ---
 
@@ -142,15 +143,39 @@ openssl s_client -connect example.com:443 -servername example.com \
 
 ## Computing the SPKI fingerprint
 
+### Browser
+
+1. Go to any HTTPS site through your corporate proxy.
+2. Click the **padlock** in the address bar, then **Connection is secure**, then the certificate icon.
+3. Open the **Details** tab and select the **second-to-last** certificate in the hierarchy — this is the CA that signed the site certificate.
+4. Scroll to the bottom of the **Certificate Fields** panel. The last two entries are the Certificate fingerprint and the **Public Key** fingerprint. Copy the **Public Key** fingerprint - that is the SPKI fingerprint.
+
+> Works in Chrome, Edge, and any Chromium-based browser. Firefox shows the same fields under **Security** → **View Certificate** → **Details**.
+
+### CLI
+
 Run this from any machine behind your corporate network:
 
 ```bash
-openssl s_client -connect example.com:443 -servername example.com -showcerts \
-    </dev/null 2>/dev/null \
-    | openssl x509 -noout -pubkey \
-    | openssl pkey -pubin -outform DER \
-    | openssl dgst -sha256 -binary \
-    | base64
+HOST=example.com
+
+# Which cert in the chain to fingerprint:
+#   0  = leaf (the site cert — don't use this)
+#   1  = issuing / intermediate CA
+#   2+ = issuing
+#   N  = root CA
+CHAIN_INDEX=1
+
+openssl s_client -connect "$HOST:443" -servername "$HOST" -showcerts </dev/null 2>/dev/null \
+  | awk -v n="$CHAIN_INDEX" '
+      /-----BEGIN CERTIFICATE-----/ { i++; p=(i == n + 1) }
+      p
+    ' \
+  | openssl x509 -noout -pubkey \
+  | openssl pkey -pubin -outform DER \
+  | openssl dgst -sha256 -r \
+  | cut -d ' ' -f1
 ```
 
-This computes the SHA-256 fingerprint of the root CA's public key. The fingerprint survives certificate renewals as long as the CA reuses the same key pair (which most corporate CAs do).
+The output is the SHA-256 hash of that certificate's public key. It stays stable across certificate renewals as long as the CA reuses the same key pair, which corporate CAs typically do.
+

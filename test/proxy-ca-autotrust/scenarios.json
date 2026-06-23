@@ -1,64 +1,90 @@
 {
     "extra_cert_only": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "runArgs": ["--security-opt", "label=disable"],
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "",
+                "tls_test_url": "",
                 "extra_certs": "https://letsencrypt.org/certs/isrgrootx1.pem"
             }
         }
     },
     "detect_issuer_pattern": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "build": { "options": ["--network=host"] },
+        "runArgs": ["--security-opt", "label=disable"],
+        "build": {
+            "options": [
+                "--network=host"
+            ]
+        },
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "https://127.0.0.1:18443",
-                "issuer_pattern": "O=Zscaler Inc.",
+                "tls_test_url": "https://127.0.0.1:18443",
+                "cert_pattern": "O=Test Proxy Inc\\.",
                 "key_fingerprint": ""
             }
         }
     },
     "detect_key_fingerprint": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "build": { "options": ["--network=host"] },
+        "runArgs": ["--security-opt", "label=disable"],
+        "build": {
+            "options": [
+                "--network=host"
+            ]
+        },
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "https://127.0.0.1:18443",
-                "issuer_pattern": "",
-                "key_fingerprint": "mjoVQJojjENQVXHuAW5+XSR1TfTEzGoJZ8RSbPQGgQ0="
+                "tls_test_url": "https://127.0.0.1:18443",
+                "cert_pattern": "",
+                "key_fingerprint": "a04303e2582c3291e4ed1e5d9f26a5eac1da43cc83c683bee375f104e612da69"
             }
         }
     },
     "detect_both": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "build": { "options": ["--network=host"] },
+        "runArgs": ["--security-opt", "label=disable"],
+        "build": {
+            "options": [
+                "--network=host"
+            ]
+        },
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "https://127.0.0.1:18443",
-                "issuer_pattern": "O=Zscaler Inc.",
-                "key_fingerprint": "mjoVQJojjENQVXHuAW5+XSR1TfTEzGoJZ8RSbPQGgQ0="
+                "tls_test_url": "https://127.0.0.1:18443",
+                "cert_pattern": "O=Test Proxy Inc\\.",
+                "key_fingerprint": "a04303e2582c3291e4ed1e5d9f26a5eac1da43cc83c683bee375f104e612da69"
             }
         }
     },
     "detect_no_match_wrong_issuer": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "build": { "options": ["--network=host"] },
+        "runArgs": ["--security-opt", "label=disable"],
+        "build": {
+            "options": [
+                "--network=host"
+            ]
+        },
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "https://127.0.0.1:18443",
-                "issuer_pattern": "O=AcmeCorp",
+                "tls_test_url": "https://127.0.0.1:18443",
+                "cert_pattern": "O=AcmeCorp",
                 "key_fingerprint": ""
             }
         }
     },
     "detect_no_match_wrong_fingerprint": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-        "build": { "options": ["--network=host"] },
+        "runArgs": ["--security-opt", "label=disable"],
+        "build": {
+            "options": [
+                "--network=host"
+            ]
+        },
         "features": {
             "proxy-ca-autotrust": {
-                "detect_url": "https://127.0.0.1:18443",
-                "issuer_pattern": "",
+                "tls_test_url": "https://127.0.0.1:18443",
+                "cert_pattern": "",
                 "key_fingerprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
             }
         }

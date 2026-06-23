@@ -1,24 +1,24 @@
 {
     "id": "proxy-ca-autotrust",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Proxy CA Auto-Trust",
-    "description": "Detects a corporate SSL inspection proxy and automatically trusts its root CA. Optionally installs additional CA certificates.",
+    "description": "Detects a TLS trust gap caused by a corporate SSL inspection proxy and automatically trusts its root CA. Optionally installs additional CA certificates.",
     "documentationURL": "https://github.com/OnceUponALoop/devcontainer-features/tree/main/src/proxy-ca-autotrust",
     "options": {
-        "detect_url": {
+        "tls_test_url": {
             "type": "string",
             "default": "https://example.com",
-            "description": "HTTPS URL to probe for SSL inspection. If verification fails and the chain matches issuer_pattern, the proxy root CA is trusted automatically. Set to empty to skip detection."
+            "description": "HTTPS URL probed to detect a TLS trust gap. If verification fails, the certificate chain is fetched and scanned for a CA matching cert_pattern and/or key_fingerprint. Set to empty to skip detection entirely."
         },
-        "issuer_pattern": {
+        "cert_pattern": {
             "type": "string",
-            "default": "O=Zscaler Inc.",
-            "description": "String matched (case-insensitive) against certificate issuers in the probed chain. At least one of issuer_pattern or key_fingerprint must be set when detect_url is set."
+            "default": "Subject:.*O=Zscaler Inc\\.",
+            "description": "Case-insensitive regex matched against the full text of each certificate in the probed chain (subject, issuer, SANs, policy OIDs, etc.). At least one of cert_pattern or key_fingerprint must be set when tls_test_url is set."
         },
         "key_fingerprint": {
             "type": "string",
             "default": "",
-            "description": "SHA-256 SPKI fingerprint (base64) of the proxy CA's public key. When set, a certificate in the chain must match both this and issuer_pattern (if also set). More secure than issuer_pattern alone and survives certificate renewals."
+            "description": "SHA-256 SPKI fingerprint (base64) of the proxy CA's public key. When set alone, a certificate in the chain must match this fingerprint directly. When set together with cert_pattern, the fingerprint is checked against the issuer of the pattern-matched cert (cert[i+1]), enabling two-factor pinning. Survives certificate renewals when the CA reuses its key pair."
         },
         "trust_chain": {
             "type": "boolean",
