@@ -21,7 +21,6 @@ FEATURE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 apt-get update -y
 apt-get install -y --no-install-recommends \
-    curl \
     libarchive-tools
 
 # -----------------------------------------------------------------------------

@@ -21,7 +21,7 @@
             "description": "CPU architecture. Auto-detected from uname -m when empty."
         }
     },
-    "installsAfter": [
-        "ghcr.io/devcontainers/features/common-utils"
-    ]
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/common-utils": {}
+    }
 }

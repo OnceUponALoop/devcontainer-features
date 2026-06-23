@@ -37,7 +37,7 @@
         "GIT_SSL_CAINFO": "/etc/ssl/certs/ca-certificates.crt",
         "NODE_EXTRA_CA_CERTS": "/etc/ssl/certs/ca-certificates.crt"
     },
-    "installsAfter": [
-        "ghcr.io/devcontainers/features/common-utils"
-    ]
+    "dependsOn": {
+        "ghcr.io/devcontainers/features/common-utils": {}
+    }
 }

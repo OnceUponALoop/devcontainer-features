@@ -16,9 +16,8 @@ jobs:
           - proxy-ca-autotrust
           - install-mise-copr
         baseImage:
-          - debian:latest
-          - ubuntu:latest
           - mcr.microsoft.com/devcontainers/base:ubuntu
+          - mcr.microsoft.com/devcontainers/base:debian
     steps:
       - uses: actions/checkout@v6
 
