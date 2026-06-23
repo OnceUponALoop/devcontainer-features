@@ -7,5 +7,60 @@
                 "extra_certs": "https://letsencrypt.org/certs/isrgrootx1.pem"
             }
         }
+    },
+    "detect_issuer_pattern": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "build": { "options": ["--network=host"] },
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "https://127.0.0.1:18443",
+                "issuer_pattern": "O=Zscaler Inc.",
+                "key_fingerprint": ""
+            }
+        }
+    },
+    "detect_key_fingerprint": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "build": { "options": ["--network=host"] },
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "https://127.0.0.1:18443",
+                "issuer_pattern": "",
+                "key_fingerprint": "mjoVQJojjENQVXHuAW5+XSR1TfTEzGoJZ8RSbPQGgQ0="
+            }
+        }
+    },
+    "detect_both": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "build": { "options": ["--network=host"] },
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "https://127.0.0.1:18443",
+                "issuer_pattern": "O=Zscaler Inc.",
+                "key_fingerprint": "mjoVQJojjENQVXHuAW5+XSR1TfTEzGoJZ8RSbPQGgQ0="
+            }
+        }
+    },
+    "detect_no_match_wrong_issuer": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "build": { "options": ["--network=host"] },
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "https://127.0.0.1:18443",
+                "issuer_pattern": "O=AcmeCorp",
+                "key_fingerprint": ""
+            }
+        }
+    },
+    "detect_no_match_wrong_fingerprint": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "build": { "options": ["--network=host"] },
+        "features": {
+            "proxy-ca-autotrust": {
+                "detect_url": "https://127.0.0.1:18443",
+                "issuer_pattern": "",
+                "key_fingerprint": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+            }
+        }
     }
 }

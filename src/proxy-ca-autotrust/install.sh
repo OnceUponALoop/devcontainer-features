@@ -70,8 +70,8 @@ find_root_cert() {
     for i in $(seq 0 $((count - 1))); do
         local f="${TMP_DIR}/chain-cert-${i}.pem"
         local subj iss
-        subj=$(openssl x509 -noout -subject -in "${f}" 2>/dev/null | sed 's/^subject=//')
-        iss=$(openssl x509 -noout -issuer -in "${f}" 2>/dev/null | sed 's/^issuer=//')
+        subj=$(openssl x509 -noout -subject -nameopt compat -in "${f}" 2>/dev/null | sed 's/^subject=//')
+        iss=$(openssl x509 -noout -issuer -nameopt compat -in "${f}" 2>/dev/null | sed 's/^issuer=//')
         if [[ "${subj}" == "${iss}" ]]; then
             root="${f}"
             log "🔐 Root CA: ${subj}" >&2
@@ -104,7 +104,7 @@ install_chain_certs() {
     for i in $(seq 1 $((count - 1))); do
         local f="${TMP_DIR}/chain-cert-${i}.pem"
         local subj
-        subj=$(openssl x509 -noout -subject -in "${f}" 2>/dev/null | sed 's/^subject=//')
+        subj=$(openssl x509 -noout -subject -nameopt compat -in "${f}" 2>/dev/null | sed 's/^subject=//')
         cp "${f}" "${CERT_DIR}/chain-cert-${i}.crt"
         chmod 0644 "${CERT_DIR}/chain-cert-${i}.crt"
         log "✅ Trusted chain certificate: ${subj}"
@@ -165,7 +165,7 @@ detect_and_trust_proxy_ca() {
 
         if [[ -n "${ISSUER_PATTERN}" ]]; then
             local issuer
-            issuer=$(openssl x509 -noout -issuer -in "${f}" 2>/dev/null || true)
+            issuer=$(openssl x509 -noout -issuer -nameopt compat -in "${f}" 2>/dev/null || true)
             echo "${issuer}" | grep -qi "${ISSUER_PATTERN}" || issuer_ok=false
         fi
 
